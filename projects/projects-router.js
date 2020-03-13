@@ -30,7 +30,7 @@ router.post('/', validateProject, async (req, res) => {
   });
 
 //GET project by id
-    router.get('/:id', valdateProjectId, async (req,res) => {
+    router.get('/:id', validateProjectId, async (req,res) => {
        try {
            const project = await Projects.get(req.params.id);
            if(project) {
@@ -45,7 +45,7 @@ router.post('/', validateProject, async (req, res) => {
     })
 //update a project
 router.put('/:id', validateProjectId, async (req, res) => {
-    Project.update(req.params.id, req.body)
+    Projects.update(req.params.id, req.body)
       .then(project => {
         res.status(201).json(project);
       })
@@ -73,7 +73,15 @@ router.delete('/:id', validateProjectId, (req, res) => {
 //ACTIONS: 
 
 //get a projects actions (get action by project id)
-
+router.get('/:id/actions', validateProjectId, (req, res) => {
+    Projects.getProjectActions(req.params.id)
+      .then(actions => {
+        res.status(200).json(actions);
+      })
+      .catch(err => {
+        res.status(500).json({ error: "Error retrieving posts data" });
+      });
+  });
 
 //create an action by project id
 
@@ -101,7 +109,7 @@ function validateProject(req, res, next) {
 
   // ensures that projectId exists
 function validateProjectId(req, res, next) {
-    Project.get(req.params.id)
+    Projects.get(req.params.id)
       .then(project => {
         if(project) {
           req.project = project;
@@ -115,18 +123,13 @@ function validateProjectId(req, res, next) {
       });
   }
   
-
   //ensures that action exists
   function validateAction(req, res, next) {
-    if (!req.body) {
-      res.status(400).json({message: "Missing action data"})
+    if(!req.body.description || !req.body.notes) {
+      res.status(400).json({ message: "Missing required text field." });
     }
-    else if (!req.body.description) {
-      res.status(400).json({message: "Missing required description field"})
-    }
-    else {
-      next();
-    }
+    next();
   }
+
 
 module.exports = router;
