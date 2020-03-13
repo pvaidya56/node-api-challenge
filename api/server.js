@@ -1,6 +1,6 @@
 const express = require("express");
 
-// const projectsRouter = require('../projects/projects-router.js');
+const projectsRouter = require('../projects/projects-router.js');
 
 const server = express();
 
@@ -15,6 +15,6 @@ server.get("/", (req, res) => {
   });
 
   
-//   server.use("/api/projects", projectsRouter);
+  server.use("/api/projects", projectsRouter);
   
   module.exports = server;
