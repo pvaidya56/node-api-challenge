@@ -20,17 +20,17 @@ router.get('/', (req,res) => {
 
 //create a project
 router.post('/', validateProject, async (req, res) => {
-    try{
-        const project = await Projects.insert(req.body)
-        res.status(201).json(response)
-    }
-    catch(err) {
-        res.status(500).json({error: "Error creating project"})
-    }
-});
+    Project.insert(req.body)
+      .then(project => {
+        res.status(201).json(project);
+      })
+      .catch(err => {
+        res.status(500).json({ error: "Error creating project" });
+      });
+  });
 
 //GET project by id
-    router.get('/:id', async (req,res) => {
+    router.get('/:id', valdateProjectId, async (req,res) => {
        try {
            const project = await Projects.get(req.params.id);
            if(project) {
@@ -44,24 +44,18 @@ router.post('/', validateProject, async (req, res) => {
        }
     })
 //update a project
-router.put('/:id', async (req, res) => {
-    try {
-        const updatedProject = await Projects.update(req.params.id, req.body)
-
-        if (updatedProject) {
-            res.status(201).json(updatedProject)
-        }
-        else {
-            res.status(404).json({message: "Project not found"})
-        }
-    }
-    catch (err) {
-        res.status(500).json({error: "Project not be updated"})
-    }
+router.put('/:id', validateProjectId, async (req, res) => {
+    Project.update(req.params.id, req.body)
+      .then(project => {
+        res.status(201).json(project);
+      })
+      .catch(err => {
+        res.status(500).json({ error: "Error updating user" })
+      });
 })
 
 //delete a project
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateProjectId, (req, res) => {
     Projects.remove(req.params.id)
         .then(response => {
             console.log(response)
@@ -76,6 +70,16 @@ router.delete('/:id', (req, res) => {
             res.status(500).json({error: "Project could not be deleted"})
         })
 })
+//ACTIONS: 
+
+//get a projects actions (get action by project id)
+
+
+//create an action by project id
+
+//update an action by project id
+
+//delete an action by project id
 
 
 
@@ -94,6 +98,23 @@ function validateProject(req, res, next) {
       next();
     }
   }
+
+  // ensures that projectId exists
+function validateProjectId(req, res, next) {
+    Project.get(req.params.id)
+      .then(project => {
+        if(project) {
+          req.project = project;
+          next();
+        } else {
+          res.status(400).json({ message: "Invalid project ID" });
+        }
+      })
+      .catch(err => {
+        res.status(500).json({ message: "Error retrieving project data" });
+      });
+  }
+  
 
   //ensures that action exists
   function validateAction(req, res, next) {
