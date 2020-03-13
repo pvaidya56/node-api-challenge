@@ -84,6 +84,16 @@ router.get('/:id/actions', validateProjectId, (req, res) => {
   });
 
 //create an action by project id
+router.post('/:id/actions', validateProjectId, validateAction, (req, res) => {
+    req.body.project_id = req.params.id;
+    Actions.insert(req.body)
+     .then(action => {
+       res.status(201).json(action);
+     })
+     .catch(err => {
+       res.status(500).json({error: "Error creating action"});
+     });
+  });
 
 //update an action by project id
 
