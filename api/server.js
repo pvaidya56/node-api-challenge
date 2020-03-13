@@ -8,13 +8,10 @@ const server = express();
 server.use(express.json());
 
 server.get("/", (req, res) => {
-    const query = req.query;
-  
-    console.log("query", query);
-  
-    res.status(200).json(query);
+    res.status(200).json({
+        message: process.env.SECRET_MESSAGE || "Welcome",
   });
-
+})
   
   server.use("/api", projectsRouter);
 
